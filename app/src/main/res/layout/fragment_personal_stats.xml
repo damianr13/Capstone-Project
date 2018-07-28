@@ -1,0 +1,47 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="nanodegree.damian.runny.fragments.PersonalStatsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.hadiidbouk.charts.ChartProgressBar
+            android:id="@+id/cpb_history"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_gravity="top"
+            app:hdBarHeight="170dp"
+            app:hdBarWidth="7dp"
+            app:hdBarRadius="10dp"
+            app:hdMaxValue="10"
+            app:hdEmptyColor="@color/empty"
+            app:hdProgressColor="@color/progress"
+            app:hdProgressClickColor="@color/progress_click"
+            app:hdPinBackgroundColor="@color/pin_background"
+            app:hdPinTextColor="@color/pin_text"
+            app:hdPinPaddingBottom="5dp"
+            app:hdBarTitleColor="@color/bar_title_color"
+            app:hdBarTitleTxtSize="12sp"
+            app:hdPinTxtSize="17sp"
+            app:hdPinMarginTop="10dp"
+            app:hdPinMarginBottom="55dp"
+            app:hdPinMarginEnd="22dp"
+            app:hdBarTitleMarginTop="9dp"
+            app:hdPinDrawable="@drawable/ic_pin"
+            app:hdProgressDisableColor="@color/progress_disable"
+            app:hdBarTitleSelectedColor="@color/bar_title_selected_color"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_history"
+            android:layout_gravity="top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</FrameLayout>

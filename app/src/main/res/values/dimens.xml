@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_start_default">8dp</dimen>
+    <dimen name="margin_top_default">4dp</dimen>
+    <dimen name="circled_image_border">2dp</dimen>
+    <dimen name="big_margin">20dp</dimen>
+</resources>

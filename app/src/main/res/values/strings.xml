@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Runny</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="label_distance">Distance</string>
+    <string name="label_time">Time</string>
+
+    <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+
+    <string name="personal_tab">Personal Stats</string>
+    <string name="friends_tab">Friends</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="stop">Stop</string>
+</resources>

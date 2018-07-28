@@ -1,0 +1,27 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="nanodegree.damian.runny.fragments.FriendsFragment">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_friends_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimaryDark">
+        <ImageView
+            style="@style/BottomBarImageAction"
+            android:src="@drawable/ic_add_friend"/>
+
+        <ImageView
+            style="@style/BottomBarImageAction"
+            android:src="@drawable/ic_delete"/>
+    </LinearLayout>
+
+</FrameLayout>
