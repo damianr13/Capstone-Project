@@ -23,7 +23,6 @@ import nanodegree.damian.runny.utils.Basics;
 
 public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCallback{
 
-    public static final String TAG = WorkoutActivity.class.getName();
     public static final float DEFAULT_ZOOM = 15f;
 
     @BindView(R.id.toolbar)
@@ -49,11 +48,10 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        new GetSessionAsyncTask(AppDatabase.getInstance(this), workoutSessionLiveData ->{
-            workoutSessionLiveData.observe(WorkoutActivity.this, session -> {
-                runOnUiThread(() -> updateViews(session));
-            });
-        }).execute();
+        new GetSessionAsyncTask(AppDatabase.getInstance(this), workoutSessionLiveData ->
+                workoutSessionLiveData.observe(WorkoutActivity.this, session -> {
+                    runOnUiThread(() -> updateViews(session));
+        })).execute();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
     private void updateViews(WorkoutSession session) {
         animateMapTo(session.getLastKnownLocation());
 
-        mTimeTextView.setText(session.getFormattedTimeValue());
+        mTimeTextView.setText(session.getFormattedTimeValue(true));
         mDistanceTextView.setText(session.getFormattedDistanceValue());
     }
 

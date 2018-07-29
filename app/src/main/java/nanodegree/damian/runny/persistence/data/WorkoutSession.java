@@ -121,8 +121,17 @@ public class WorkoutSession {
         this.lastKnownLocation = lastKnownLocation;
     }
 
-    public String getFormattedTimeValue() {
-        long timeCopy = Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis();
+    public String getFormattedTimeValue(boolean onGoing) {
+        Calendar upperValue = endTime;
+        if (onGoing) {
+            upperValue = Calendar.getInstance();
+        }
+
+        if (upperValue == null) {
+            return "N/A";
+        }
+
+        long timeCopy = upperValue.getTimeInMillis() - startTime.getTimeInMillis();
         Map<String, Long> formattedTime = new LinkedHashMap<>();
         long hours = TimeUnit.MILLISECONDS.toHours(timeCopy);
         timeCopy -= TimeUnit.HOURS.toMillis(hours);

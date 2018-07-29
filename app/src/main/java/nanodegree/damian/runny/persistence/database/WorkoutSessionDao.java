@@ -21,7 +21,7 @@ public interface WorkoutSessionDao {
     @Query("SELECT * FROM workout_session ORDER BY start_time DESC LIMIT 1")
     WorkoutSession getCurrentSession();
 
-    @Query("SELECT * FROM workout_session")
+    @Query("SELECT * FROM workout_session ORDER BY start_time DESC")
     LiveData<List<WorkoutSession>> getAllSessionsLiveData();
 
     @Insert
