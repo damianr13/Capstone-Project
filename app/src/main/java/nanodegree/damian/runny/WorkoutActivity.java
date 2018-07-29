@@ -1,11 +1,12 @@
 package nanodegree.damian.runny;
 
+import android.arch.lifecycle.LiveData;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,19 +15,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import nanodegree.damian.runny.controller.WorkoutController;
-import nanodegree.damian.runny.controller.WorkoutUpdateBundle;
+import nanodegree.damian.runny.persistence.data.WorkoutSession;
+import nanodegree.damian.runny.persistence.database.AppDatabase;
 import nanodegree.damian.runny.utils.Basics;
 
-public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCallback,
-        Observer {
+public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     public static final String TAG = WorkoutActivity.class.getName();
     public static final float DEFAULT_ZOOM = 15f;
@@ -54,23 +49,11 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-//        connectToController(getResources().getInteger(R.integer.workout_controller_id));
-    }
-
-    private void connectToController(final int id) {
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                WorkoutController result = WorkoutController.getInstance(id);
-                // if the controller is not available try again after some time
-                if (result == null) {
-                    connectToController(id);
-                    return ;
-                }
-
-                result.addObserver(WorkoutActivity.this);
-            }
-        }, 1000);
+        new GetSessionAsyncTask(AppDatabase.getInstance(this), workoutSessionLiveData ->{
+            workoutSessionLiveData.observe(WorkoutActivity.this, session -> {
+                runOnUiThread(() -> updateViews(session));
+            });
+        }).execute();
     }
 
     @Override
@@ -88,24 +71,11 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        WorkoutUpdateBundle bundle;
-        try {
-            bundle = (WorkoutUpdateBundle) arg;
-        } catch (ClassCastException ex) {
-            Log.e(TAG, "Expected WorkoutUpdateBundle argument:" + ex);
-            return ;
-        }
+    private void updateViews(WorkoutSession session) {
+        animateMapTo(session.getLastKnownLocation());
 
-        runOnUiThread(() -> updateViews(bundle));
-    }
-
-    private void updateViews(WorkoutUpdateBundle bundle) {
-        animateMapTo(bundle.getLocation());
-
-        mTimeTextView.setText(bundle.getFormattedTimeValue());
-        mDistanceTextView.setText(bundle.getFormattedDistanceValue());
+        mTimeTextView.setText(session.getFormattedTimeValue());
+        mDistanceTextView.setText(session.getFormattedDistanceValue());
     }
 
     private void animateMapTo(Location location) {
@@ -118,5 +88,31 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
             mGoogleMap.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(currentPosition, DEFAULT_ZOOM));
         }
+    }
+
+    static class GetSessionAsyncTask extends AsyncTask<Void, Void, LiveData<WorkoutSession>> {
+
+        private AppDatabase mDb;
+        private OnSessionRetrievedCallback mCallback;
+
+        GetSessionAsyncTask(AppDatabase database, OnSessionRetrievedCallback callback) {
+            mDb = database;
+            mCallback = callback;
+        }
+
+        @Override
+        protected LiveData<WorkoutSession> doInBackground(Void... voids) {
+            return mDb.workoutSessionDao().getCurrentSessionLiveData();
+        }
+
+        @Override
+        protected void onPostExecute(LiveData<WorkoutSession> workoutSessionLiveData) {
+            super.onPostExecute(workoutSessionLiveData);
+            mCallback.sessionRetrieved(workoutSessionLiveData);
+        }
+    }
+
+    interface OnSessionRetrievedCallback {
+        void sessionRetrieved(LiveData<WorkoutSession> workoutSessionLiveData);
     }
 }

@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -15,6 +16,8 @@ import android.util.Log;
 import nanodegree.damian.runny.R;
 import nanodegree.damian.runny.WorkoutActivity;
 import nanodegree.damian.runny.controller.WorkoutController;
+import nanodegree.damian.runny.persistence.data.WorkoutSession;
+import nanodegree.damian.runny.persistence.database.AppDatabase;
 
 /**
  * A foreground service that stays active and tracks the workout even after the app was killed
@@ -36,20 +39,33 @@ public class WorkoutService extends Service {
 
     private WorkoutController mWorkoutController;
 
+    public WorkoutService() {
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind got called");
         return null;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "Called on start");
         if (intent == null) {
+            // this happens when the app was killed so we recreate the session controller
+            if (mWorkoutController == null) {
+                Log.d(TAG, "Controller was null");
+                new GetCurrentSessionAsyncTask(AppDatabase.getInstance(this), session ->
+                    mWorkoutController = new WorkoutController(this, session)
+                ).execute();
+            }
             return START_NOT_STICKY;
         }
 
         String action = intent.getAction();
         if (action == null) {
+            Log.d(TAG, "Action is null");
             return START_NOT_STICKY;
         }
 
@@ -61,7 +77,7 @@ public class WorkoutService extends Service {
                 stopForegroundService();
                 break;
         }
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void stopForegroundService() {
@@ -80,8 +96,8 @@ public class WorkoutService extends Service {
     }
 
     private void startForegroundService() {
-        mWorkoutController = new WorkoutController(this,
-                getResources().getInteger(R.integer.workout_controller_id));
+        Log.d(TAG, "Start foreground service method");
+        mWorkoutController = new WorkoutController(this);
 
         Intent stopRunningIntent = new Intent(this, WorkoutService.class);
         stopRunningIntent.setAction(ACTION_STOP);
@@ -123,5 +139,31 @@ public class WorkoutService extends Service {
             }
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    static class GetCurrentSessionAsyncTask extends AsyncTask<Void, Void, WorkoutSession> {
+
+        private AppDatabase mDb;
+        private OnCurrentSessionRetrievedCallback mCallback;
+
+        GetCurrentSessionAsyncTask(AppDatabase database, OnCurrentSessionRetrievedCallback callback) {
+            mDb = database;
+            mCallback = callback;
+        }
+
+        @Override
+        protected WorkoutSession doInBackground(Void... voids) {
+            return mDb.workoutSessionDao().getCurrentSession();
+        }
+
+        @Override
+        protected void onPostExecute(WorkoutSession session) {
+            super.onPostExecute(session);
+            mCallback.currentSessionRetrieved(session);
+        }
+    }
+
+    interface OnCurrentSessionRetrievedCallback {
+        void currentSessionRetrieved(WorkoutSession session);
     }
 }

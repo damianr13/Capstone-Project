@@ -4,17 +4,20 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import nanodegree.damian.runny.persistence.data.WorkoutSession;
+import nanodegree.damian.runny.persistence.database.AppDatabase;
 import nanodegree.damian.runny.utils.Basics;
 
 /**
@@ -29,39 +32,43 @@ public class WorkoutController extends Observable implements LocationListener{
 
     private static final int MAX_ACCURACY_MARGIN = 30;
 
-    private Calendar mStartTime;
     private Context mContext;
     private LocationManager mLocationManager;
     private Location mLastKnownLocation;
     private float mDistance;
     private boolean mStarted;
-    private int mId;
+
+    private WorkoutSession mSession;
 
     private Timer mInformingTimer;
 
-    private static SparseArray<WorkoutController> instances = new SparseArray<>();
-
-    public static WorkoutController getInstance(int id) {
-        return instances.get(id);
-    }
-
-    public WorkoutController(Context context, int id) {
+    public WorkoutController(Context context) {
         this.mContext = context;
-        this.mId = id;
 
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         registerLocationListener();
+    }
 
-        WorkoutController previouslyStoredInstance = instances.get(id);
-        if (previouslyStoredInstance != null) {
-            previouslyStoredInstance.stop();
-        }
-        instances.append(id, this);
+    public WorkoutController(Context context, WorkoutSession session) {
+        this(context);
+        Log.d(TAG, "Called secondary constructor");
+
+        mSession = session;
+        mStarted = true;
+        startInformingListeners();
+        mDistance = session.getDistance();
     }
 
     public void start() {
         mStarted = true;
-        mStartTime = Calendar.getInstance();
+        Calendar mStartTime = Calendar.getInstance();
+
+        mSession = new WorkoutSession(mStartTime, null, 0f,
+                new ArrayList<>(), mLastKnownLocation);
+        new InsertSessionAsyncTask(AppDatabase.getInstance(mContext), id -> {
+            mSession.setId(id);
+            mSession.setPersisted(true);
+        }).execute(mSession);
 
         startInformingListeners();
     }
@@ -77,21 +84,15 @@ public class WorkoutController extends Observable implements LocationListener{
     }
 
     private void informObservers() {
-        WorkoutUpdateBundle bundle = new WorkoutUpdateBundle(mLastKnownLocation, mDistance,
-                Calendar.getInstance().getTimeInMillis() - mStartTime.getTimeInMillis());
-
-        setChanged();
-        notifyObservers(bundle);
-
-        Log.v(TAG, "Observers updated from WorkoutController");
+        new UpdateSessionAsyncTask(AppDatabase.getInstance(mContext)).execute(mSession);
     }
 
     public void stop() {
         mInformingTimer.cancel();
         mInformingTimer.purge();
 
-        instances.remove(mId);
-        //TODO: store info about the current session in database
+        mSession.setEndTime(Calendar.getInstance());
+        new UpdateSessionAsyncTask(AppDatabase.getInstance(mContext)).execute(mSession);
         mLocationManager.removeUpdates(this);
     }
 
@@ -119,7 +120,7 @@ public class WorkoutController extends Observable implements LocationListener{
         if (mStarted && mLastKnownLocation != null &&
                 allLocationsAreAccurate(mLastKnownLocation, location)) {
             mDistance += mLastKnownLocation.distanceTo(location);
-            Toast.makeText(mContext, "Distance updated", Toast.LENGTH_SHORT).show();
+            mSession.setDistance(mDistance);
         }
 
         Log.v(TAG, "Current distance: " + mDistance +
@@ -150,5 +151,54 @@ public class WorkoutController extends Observable implements LocationListener{
         }
 
         return true;
+    }
+
+    static class InsertSessionAsyncTask extends AsyncTask<WorkoutSession, Void, Long> {
+
+        private AppDatabase mDb;
+        private OnInsertCallback mCallback;
+
+        InsertSessionAsyncTask(AppDatabase database, OnInsertCallback callback) {
+            mDb = database;
+            mCallback = callback;
+        }
+
+        @Override
+        protected Long doInBackground(WorkoutSession... workoutSessions) {
+            if (workoutSessions.length < 1) {
+                return null;
+            }
+
+            return mDb.workoutSessionDao().insertWorkoutSession(workoutSessions[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Long id) {
+            super.onPostExecute(id);
+            mCallback.insertOperationCompleted(id);
+        }
+    }
+
+    static class UpdateSessionAsyncTask extends AsyncTask<WorkoutSession, Void, Void> {
+
+        private AppDatabase mDb;
+
+        UpdateSessionAsyncTask(AppDatabase database) {
+            mDb = database;
+        }
+
+        @Override
+        protected Void doInBackground(WorkoutSession... workoutSessions) {
+            if (workoutSessions.length < 1) {
+                return null;
+            }
+
+            mDb.workoutSessionDao().updateWorkoutSession(workoutSessions[0]);
+            return null;
+        }
+    }
+
+    private interface OnInsertCallback {
+        void insertOperationCompleted(Long id);
     }
 }
