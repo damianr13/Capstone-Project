@@ -1,11 +1,8 @@
 apply plugin: 'com.android.application'
 
-def GMAPS_API_KEY = GmapsKey ?: '"Insert your google maps key in gradle.properties"'
-
 android {
     compileSdkVersion 27
     defaultConfig {
-        manifestPlaceholders = [gmaps_api_key: GMAPS_API_KEY]
         applicationId "nanodegree.damian.runny"
         minSdkVersion 16
         targetSdkVersion 27
