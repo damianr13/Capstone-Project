@@ -1,10 +1,12 @@
 package nanodegree.damian.runny;
 
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,6 +22,7 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nanodegree.damian.runny.controller.WorkoutController;
+import nanodegree.damian.runny.controller.WorkoutUpdateBundle;
 import nanodegree.damian.runny.utils.Basics;
 
 public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -31,8 +34,13 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
+    @BindView(R.id.tv_value_distance)
+    TextView mDistanceTextView;
+
+    @BindView(R.id.tv_value_time)
+    TextView mTimeTextView;
+
     private GoogleMap mGoogleMap;
-    private Location mLastKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +54,7 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        connectToController(getResources().getInteger(R.integer.workout_controller_id));
+//        connectToController(getResources().getInteger(R.integer.workout_controller_id));
     }
 
     private void connectToController(final int id) {
@@ -73,22 +81,31 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
             mGoogleMap.setMyLocationEnabled(true);
         }
 
-        Location center = mLastKnownLocation;
-        animateMapTo(center);
+        if (Basics.hasAccessToLocation(this)) {
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            Location center = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            animateMapTo(center);
+        }
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        Location location;
+        WorkoutUpdateBundle bundle;
         try {
-            location = (Location) arg;
+            bundle = (WorkoutUpdateBundle) arg;
         } catch (ClassCastException ex) {
-            Log.e(TAG, "Expected Location argument:" + ex);
+            Log.e(TAG, "Expected WorkoutUpdateBundle argument:" + ex);
             return ;
         }
 
-        mLastKnownLocation = location;
-        animateMapTo(location);
+        runOnUiThread(() -> updateViews(bundle));
+    }
+
+    private void updateViews(WorkoutUpdateBundle bundle) {
+        animateMapTo(bundle.getLocation());
+
+        mTimeTextView.setText(bundle.getFormattedTimeValue());
+        mDistanceTextView.setText(bundle.getFormattedDistanceValue());
     }
 
     private void animateMapTo(Location location) {

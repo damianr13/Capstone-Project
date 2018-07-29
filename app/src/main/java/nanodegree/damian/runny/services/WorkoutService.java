@@ -70,6 +70,9 @@ public class WorkoutService extends Service {
         if (mWorkoutController != null) {
             mWorkoutController.stop();
         }
+        else {
+            Log.d(TAG, "WorkoutController was null!");
+        }
 
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         stopForeground(true);

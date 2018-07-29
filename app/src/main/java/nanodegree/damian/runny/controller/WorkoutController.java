@@ -10,22 +10,24 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import nanodegree.damian.runny.utils.Basics;
 
 /**
+ * Controller of the workout session. Keeps track of distance and time, and informs the observers
+ * every second about the new state
+ *
  * Created by robert_damian on 28.07.2018.
  */
-
 public class WorkoutController extends Observable implements LocationListener{
 
-    public static final String TAG = WorkoutController.class.getName();
+    private static final String TAG = WorkoutController.class.getName();
 
     private static final int MAX_ACCURACY_MARGIN = 30;
-
-    private static final int DEFAULT_INSTANCE_ID = 1;
 
     private Calendar mStartTime;
     private Context mContext;
@@ -34,6 +36,8 @@ public class WorkoutController extends Observable implements LocationListener{
     private float mDistance;
     private boolean mStarted;
     private int mId;
+
+    private Timer mInformingTimer;
 
     private static SparseArray<WorkoutController> instances = new SparseArray<>();
 
@@ -58,9 +62,34 @@ public class WorkoutController extends Observable implements LocationListener{
     public void start() {
         mStarted = true;
         mStartTime = Calendar.getInstance();
+
+        startInformingListeners();
+    }
+
+    private void startInformingListeners() {
+        mInformingTimer = new Timer();
+        mInformingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                informObservers();
+            }
+        }, 0, TimeUnit.SECONDS.toMillis(1));
+    }
+
+    private void informObservers() {
+        WorkoutUpdateBundle bundle = new WorkoutUpdateBundle(mLastKnownLocation, mDistance,
+                Calendar.getInstance().getTimeInMillis() - mStartTime.getTimeInMillis());
+
+        setChanged();
+        notifyObservers(bundle);
+
+        Log.v(TAG, "Observers updated from WorkoutController");
     }
 
     public void stop() {
+        mInformingTimer.cancel();
+        mInformingTimer.purge();
+
         instances.remove(mId);
         //TODO: store info about the current session in database
         mLocationManager.removeUpdates(this);
@@ -96,8 +125,6 @@ public class WorkoutController extends Observable implements LocationListener{
         Log.v(TAG, "Current distance: " + mDistance +
                 "; Location accuracy: " + location.getAccuracy());
         mLastKnownLocation = location;
-        setChanged();
-        notifyObservers(location);
     }
 
     @Override
