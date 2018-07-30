@@ -1,5 +1,6 @@
 package nanodegree.damian.runny;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,6 +28,7 @@ import nanodegree.damian.runny.utils.Basics;
 public class MainActivity extends AppCompatActivity {
 
     public static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
+    public static final int PERMISSIONS_REQUEST_LOGS_AND_STORAGE = 201;
 
     @BindString(R.string.personal_tab) public String NAME_PERSONAL_STATS_TAB;
     @BindString(R.string.friends_tab) public String NAME_FRIENDS_TAB;
@@ -96,6 +98,14 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab_start)
     public void onStartRunning(View v){
+        if (!Basics.hasAccessToLogs(this) || !Basics.hasAccessToStorage(this)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_LOGS,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_LOGS_AND_STORAGE);
+        }
+
         Intent startRunnyService = new Intent(this, WorkoutService.class);
         startRunnyService.setAction(WorkoutService.ACTION_START);
         startService(startRunnyService);

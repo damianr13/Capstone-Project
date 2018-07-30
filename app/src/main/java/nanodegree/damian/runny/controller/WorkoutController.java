@@ -28,9 +28,9 @@ import nanodegree.damian.runny.utils.Basics;
  */
 public class WorkoutController extends Observable implements LocationListener{
 
-    private static final String TAG = WorkoutController.class.getName();
+    public static final String TAG = WorkoutController.class.getName();
 
-    private static final int MAX_ACCURACY_MARGIN = 30;
+    private static final int MAX_ACCURACY_MARGIN = 50;
 
     private Context mContext;
     private LocationManager mLocationManager;
@@ -115,7 +115,8 @@ public class WorkoutController extends Observable implements LocationListener{
         }
 
         Log.v(TAG, "Location changed! Lat: " + location.getLatitude() +
-                ", Lng: " + location.getLongitude());
+                ", Lng: " + location.getLongitude() +
+                ", Accuracy " + location.getAccuracy());
 
         if (mStarted && mLastKnownLocation != null &&
                 allLocationsAreAccurate(mLastKnownLocation, location)) {

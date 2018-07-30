@@ -7,11 +7,15 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+
+import java.io.File;
+import java.io.IOException;
 
 import nanodegree.damian.runny.R;
 import nanodegree.damian.runny.WorkoutActivity;
@@ -95,7 +99,26 @@ public class WorkoutService extends Service {
         stopSelf();
     }
 
+    private void initLogsWriting() {
+        String appLogsDirectoryName = Environment.getExternalStorageDirectory() + "/RunnyLogs";
+        File currentLogFile = new File(appLogsDirectoryName +
+                "/log" +
+                System.currentTimeMillis() +
+                ".txt");
+
+        currentLogFile.getParentFile().mkdirs();
+        try {
+            Runtime.getRuntime().exec("logcat -c");
+            Runtime.getRuntime().exec("logcat -f " + currentLogFile + " " +
+                    WorkoutController.TAG + ":D");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void startForegroundService() {
+        initLogsWriting();
+
         Log.d(TAG, "Start foreground service method");
         mWorkoutController = new WorkoutController(this);
 
