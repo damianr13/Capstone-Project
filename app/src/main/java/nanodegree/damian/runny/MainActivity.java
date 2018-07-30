@@ -23,6 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.squareup.picasso.Picasso;
 
 import java.util.LinkedHashMap;
 
@@ -30,6 +31,7 @@ import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import nanodegree.damian.runny.fragments.FriendsFragment;
 import nanodegree.damian.runny.fragments.PersonalStatsFragment;
 import nanodegree.damian.runny.services.WorkoutService;
@@ -53,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.tl_tabs)
     TabLayout mTabLayout;
+
+    @BindView(R.id.civ_profile_image)
+    CircleImageView mProfileImageView;
+
     private GoogleSignInClient mGoogleSignInClient;
 
     @Override
@@ -89,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
         GoogleSignInAccount account = task.getResult();
         Log.d(TAG, account.getEmail());
+
+        Picasso.get().load(account.getPhotoUrl()).into(mProfileImageView);
     }
 
     class ViewPageAdapter extends FragmentPagerAdapter {
