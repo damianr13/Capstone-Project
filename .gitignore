@@ -11,4 +11,5 @@ gradle\.properties
 
 \.idea/
 
-app/src/debug/res/values/google_maps_api\.xml
+app/src/debug/res/values/api_access\.xml
+app/google-services\.json
