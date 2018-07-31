@@ -109,8 +109,7 @@ public class WorkoutService extends Service {
         currentLogFile.getParentFile().mkdirs();
         try {
             Runtime.getRuntime().exec("logcat -c");
-            Runtime.getRuntime().exec("logcat -f " + currentLogFile + " " +
-                    WorkoutController.TAG + ":D");
+            Runtime.getRuntime().exec("logcat -f " + currentLogFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

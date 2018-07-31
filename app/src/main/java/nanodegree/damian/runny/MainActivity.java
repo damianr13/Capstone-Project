@@ -23,6 +23,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.LinkedHashMap;
@@ -41,8 +47,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
 
+    public static final String FIREBASE_WEB_CLIENT_ID = "firebase_web_client_id_for_google";
+
     public static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
     public static final int PERMISSIONS_REQUEST_LOGS_AND_STORAGE = 201;
+
+    public static final int REQUEST_GOOGLE_SIGN_IN_CODE = 0;
 
     @BindString(R.string.personal_tab) public String NAME_PERSONAL_STATS_TAB;
     @BindString(R.string.friends_tab) public String NAME_FRIENDS_TAB;
@@ -60,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     CircleImageView mProfileImageView;
 
     private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseAuth mFirebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +78,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestIdToken(getResources().getString(R.string.firebase_id))
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), 0);
+        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_GOOGLE_SIGN_IN_CODE);
 
         setSupportActionBar(mToolbar);
 
@@ -87,16 +101,22 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_FINE_LOCATION);
         }
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-        GoogleSignInAccount account = task.getResult();
-        Log.d(TAG, account.getEmail());
+        switch (requestCode) {
+            case REQUEST_GOOGLE_SIGN_IN_CODE:
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                GoogleSignInAccount account = task.getResult();
+                Log.d(TAG, account.getEmail());
+                Picasso.get().load(account.getPhotoUrl()).into(mProfileImageView);
 
-        Picasso.get().load(account.getPhotoUrl()).into(mProfileImageView);
+                firebaseAuthWithGoogle(account);
+                break;
+        }
     }
 
     class ViewPageAdapter extends FragmentPagerAdapter {
@@ -147,5 +167,18 @@ public class MainActivity extends AppCompatActivity {
 
         Intent startRunningIntent = new Intent(this, WorkoutActivity.class);
         startActivity(startRunningIntent);
+    }
+
+    /**
+     * Taken from Firebase documentation:
+     * https://firebase.google.com/docs/auth/android/google-signin
+     * @param acct
+     */
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(authResult -> {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+            databaseReference.child("a").setValue("b");
+        });
     }
 }
