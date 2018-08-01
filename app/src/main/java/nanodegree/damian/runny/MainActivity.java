@@ -38,6 +38,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import nanodegree.damian.runny.firebase.FirebaseWriterSingleton;
 import nanodegree.damian.runny.fragments.FriendsFragment;
 import nanodegree.damian.runny.fragments.PersonalStatsFragment;
 import nanodegree.damian.runny.services.WorkoutService;
@@ -177,8 +178,7 @@ public class MainActivity extends AppCompatActivity {
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(authResult -> {
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-            databaseReference.child("a").setValue("b");
+            FirebaseWriterSingleton.getInstance().writeUserInfo(acct);
         });
     }
 }

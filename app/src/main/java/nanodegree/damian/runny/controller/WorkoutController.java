@@ -16,6 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import nanodegree.damian.runny.firebase.FirebaseWriterSingleton;
 import nanodegree.damian.runny.persistence.data.WorkoutSession;
 import nanodegree.damian.runny.persistence.database.AppDatabase;
 import nanodegree.damian.runny.utils.Basics;
@@ -93,6 +94,8 @@ public class WorkoutController extends Observable implements LocationListener{
 
         mSession.setEndTime(Calendar.getInstance());
         new UpdateSessionAsyncTask(AppDatabase.getInstance(mContext)).execute(mSession);
+        FirebaseWriterSingleton.getInstance().writeWorkoutSession(mSession);
+
         mLocationManager.removeUpdates(this);
     }
 
