@@ -38,16 +38,12 @@ import nanodegree.damian.runny.viewmodel.WorkoutHistoryViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link PersonalStatsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
  */
 public class PersonalStatsFragment extends Fragment {
 
     private static final int MONTHS_IN_YEAR = 12;
     private static final float CHART_MAX_VALUE_RATIO = 5f/3f;
 
-    private OnFragmentInteractionListener mListener;
     private WorkoutHistoryAdapter mAdapter;
 
     public PersonalStatsFragment() {
@@ -93,13 +89,6 @@ public class PersonalStatsFragment extends Fragment {
             }
             getActivity().runOnUiThread(() -> updatePerformanceBarChart(monthlyPerformance));
         });
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @WorkerThread
@@ -176,21 +165,5 @@ public class PersonalStatsFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

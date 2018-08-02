@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nanodegree.damian.runny.R;
 import nanodegree.damian.runny.persistence.data.WorkoutSession;
+import nanodegree.damian.runny.utils.Basics;
 
 /**
  * Created by robert_damian on 29.07.2018.
@@ -24,8 +25,6 @@ import nanodegree.damian.runny.persistence.data.WorkoutSession;
 
 public class WorkoutHistoryAdapter extends
         RecyclerView.Adapter<WorkoutHistoryAdapter.WorkoutSessionViewHolder> {
-
-    private static final String TIME_FORMAT = "dd/MMM/yyyy";
 
     private Context mContext;
     private List<WorkoutSession> mWorkoutSessionList;
@@ -53,16 +52,11 @@ public class WorkoutHistoryAdapter extends
         WorkoutSession session = mWorkoutSessionList.get(position);
 
         String runName = mContext.getResources()
-                .getString(R.string.run_label, formatCalendar(session.getStartTime()));
+                .getString(R.string.run_label, Basics.formatCalendar(session.getStartTime()));
         holder.workoutName.setText(runName);
 
         holder.timeValueTextView.setText(session.getFormattedTimeValue(false));
         holder.distanceValueTextView.setText(session.getFormattedDistanceValue());
-    }
-
-    private String formatCalendar(Calendar calendar) {
-        SimpleDateFormat formatter = new SimpleDateFormat(TIME_FORMAT, Locale.ENGLISH);
-        return formatter.format(calendar.getTime());
     }
 
     @Override

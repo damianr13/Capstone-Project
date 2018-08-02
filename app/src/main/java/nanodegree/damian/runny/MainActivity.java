@@ -44,7 +44,8 @@ import nanodegree.damian.runny.fragments.PersonalStatsFragment;
 import nanodegree.damian.runny.services.WorkoutService;
 import nanodegree.damian.runny.utils.Basics;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        FriendsFragment.OnFriendsFragmentInteractionListener{
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -103,6 +104,10 @@ public class MainActivity extends AppCompatActivity {
                     PERMISSIONS_REQUEST_FINE_LOCATION);
         }
 
+        if (Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
+
+        }
+
     }
 
     @Override
@@ -118,6 +123,11 @@ public class MainActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
                 break;
         }
+    }
+
+    @Override
+    public void onAddFriendClicked() {
+        onSearchRequested();
     }
 
     class ViewPageAdapter extends FragmentPagerAdapter {

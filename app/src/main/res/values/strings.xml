@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Runny</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="label_distance">Distance</string>
     <string name="label_time">Time</string>
 
@@ -14,4 +12,5 @@
     <string name="stop">Stop</string>
 
     <string name="run_label">Run %s</string>
+    <string name="search_hint">Name of your friend</string>
 </resources>

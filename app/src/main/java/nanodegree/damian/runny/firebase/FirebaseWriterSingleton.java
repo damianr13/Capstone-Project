@@ -14,8 +14,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import nanodegree.damian.runny.firebase.data.FirebaseRegisteredUser;
 import nanodegree.damian.runny.persistence.data.WorkoutSession;
 import nanodegree.damian.runny.persistence.database.converters.CalendarConverter;
+
+import static nanodegree.damian.runny.firebase.FirebaseConstants.*;
 
 /**
  * Created by robert_damian on 01.08.2018.
@@ -47,7 +50,7 @@ public class FirebaseWriterSingleton {
     public void writeUserInfo(@NonNull  final GoogleSignInAccount account) {
         final String accountId = mUser.getUid();
 
-        final DatabaseReference usersReference = mDatabaseReference.child("users").child(accountId);
+        final DatabaseReference usersReference = mDatabaseReference.child(KEY_USERS).child(accountId);
         usersReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -56,9 +59,9 @@ public class FirebaseWriterSingleton {
                 }
 
                 Map<String, String> userAsKeyValue = new HashMap<>();
-                userAsKeyValue.put("email", account.getEmail());
-                userAsKeyValue.put("name", account.getDisplayName());
-                userAsKeyValue.put("photoUrl", account.getPhotoUrl() == null ? null :
+                userAsKeyValue.put(KEY_EMAIL, account.getEmail());
+                userAsKeyValue.put(KEY_NAME, account.getDisplayName());
+                userAsKeyValue.put(KEY_PHOTO_URL, account.getPhotoUrl() == null ? null :
                         account.getPhotoUrl().toString());
                 usersReference.setValue(userAsKeyValue);
             }
@@ -71,13 +74,19 @@ public class FirebaseWriterSingleton {
     }
 
     public void writeWorkoutSession(@NonNull WorkoutSession session) {
-        DatabaseReference runReference = mDatabaseReference.child("workouts").push();
+        DatabaseReference runReference = mDatabaseReference.child(mUser.getUid()).push();
         Map<String, String> runAsKeyValue = new HashMap<>();
-        runAsKeyValue.put("startTime", CalendarConverter.toTimestamp(session.getStartTime()).toString());
-        runAsKeyValue.put("distance", session.getFormattedDistanceValue());
-        runAsKeyValue.put("time", session.getFormattedTimeValue(false));
-        runAsKeyValue.put("user", mUser.getUid());
+        runAsKeyValue.put(KEY_START_TIME, CalendarConverter.toTimestamp(session.getStartTime()).toString());
+        runAsKeyValue.put(KEY_DISTANCE, session.getFormattedDistanceValue());
+        runAsKeyValue.put(KEY_TIME, session.getFormattedTimeValue(false));
+
 
         runReference.setValue(runAsKeyValue);
+    }
+
+    public void addFriend(FirebaseRegisteredUser otherUser) {
+        DatabaseReference newFriendshipReference = mDatabaseReference.child(KEY_FRIENDSHIPS)
+                .child(mUser.getUid()).push();
+        newFriendshipReference.setValue(otherUser.userid);
     }
 }

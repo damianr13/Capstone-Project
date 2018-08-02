@@ -32,4 +32,11 @@
         <item name="android:layout_height">?attr/actionBarSize</item>
         <item name="android:background">?attr/colorPrimary</item>
     </style>
+
+    <style name="CircleProfilePicture">
+        <item name="android:layout_width">@dimen/circle_image_size</item>
+        <item name="android:layout_height">@dimen/circle_image_size</item>
+        <item name="android:layout_marginTop">@dimen/margin_top_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_start_default</item>
+    </style>
 </resources>

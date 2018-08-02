@@ -12,6 +12,7 @@
 
     <!-- My Location -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
@@ -31,10 +32,24 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data android:name="android.app.default_searchable"
+                android:value=".FriendSearchActivity" />
+
         </activity>
         <activity android:name=".WorkoutActivity" />
 
-        <service android:name=".services.WorkoutService"/>
+        <service android:name=".services.WorkoutService" />
+
+        <activity android:name=".FriendSearchActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
     </application>
 
 </manifest>

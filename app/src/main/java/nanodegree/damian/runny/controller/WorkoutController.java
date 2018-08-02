@@ -6,9 +6,14 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.util.SparseArray;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Observable;
@@ -42,12 +47,15 @@ public class WorkoutController extends Observable implements LocationListener{
     private WorkoutSession mSession;
 
     private Timer mInformingTimer;
+    private OutputStream mLogStream;
 
     public WorkoutController(Context context) {
         this.mContext = context;
 
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         registerLocationListener();
+
+        initLogs();
     }
 
     public WorkoutController(Context context, WorkoutSession session) {
@@ -89,6 +97,14 @@ public class WorkoutController extends Observable implements LocationListener{
     }
 
     public void stop() {
+        if (mLogStream != null) {
+            try {
+                mLogStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         mInformingTimer.cancel();
         mInformingTimer.purge();
 
@@ -116,10 +132,18 @@ public class WorkoutController extends Observable implements LocationListener{
         if (location == null) {
             return;
         }
-
-        Log.v(TAG, "Location changed! Lat: " + location.getLatitude() +
+        String log = "Location changed! Lat: " + location.getLatitude() +
                 ", Lng: " + location.getLongitude() +
-                ", Accuracy " + location.getAccuracy());
+                ", Accuracy " + location.getAccuracy();
+        if (mLogStream != null) {
+            try {
+                mLogStream.write(log.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Log.v(TAG, log);
 
         if (mStarted && mLastKnownLocation != null &&
                 allLocationsAreAccurate(mLastKnownLocation, location)) {
@@ -181,6 +205,25 @@ public class WorkoutController extends Observable implements LocationListener{
             super.onPostExecute(id);
             mCallback.insertOperationCompleted(id);
         }
+    }
+
+    private void initLogs() {
+        String appLogsDirectoryName = Environment.getExternalStorageDirectory() + "/RunnyLogs";
+        File currentLogFile = new File(appLogsDirectoryName +
+                "/log" +
+                System.currentTimeMillis() +
+                ".txt");
+
+        currentLogFile.getParentFile().mkdirs();
+
+        try {
+            if(currentLogFile.createNewFile()) {
+                mLogStream = new FileOutputStream(currentLogFile);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     static class UpdateSessionAsyncTask extends AsyncTask<WorkoutSession, Void, Void> {

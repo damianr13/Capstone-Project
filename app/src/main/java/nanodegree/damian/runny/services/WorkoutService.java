@@ -99,25 +99,7 @@ public class WorkoutService extends Service {
         stopSelf();
     }
 
-    private void initLogsWriting() {
-        String appLogsDirectoryName = Environment.getExternalStorageDirectory() + "/RunnyLogs";
-        File currentLogFile = new File(appLogsDirectoryName +
-                "/log" +
-                System.currentTimeMillis() +
-                ".txt");
-
-        currentLogFile.getParentFile().mkdirs();
-        try {
-            Runtime.getRuntime().exec("logcat -c");
-            Runtime.getRuntime().exec("logcat -f " + currentLogFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void startForegroundService() {
-        initLogsWriting();
-
         Log.d(TAG, "Start foreground service method");
         mWorkoutController = new WorkoutController(this);
 
