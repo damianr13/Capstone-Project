@@ -175,6 +175,18 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.fab_start)
     public void onStartRunning(View v){
+        if (!Basics.hasAccessToLocation(this)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_FINE_LOCATION);
+        }
+
+        if (!Basics.hasAccessToLogs(this)) {
+            Toast.makeText(this, "This feature is only available if location is enabled",
+                    Toast.LENGTH_LONG).show();
+            return ;
+        }
+
         Intent startRunnyService = new Intent(this, WorkoutService.class);
         startRunnyService.setAction(WorkoutService.ACTION_START);
         startService(startRunnyService);
