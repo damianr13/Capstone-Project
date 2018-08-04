@@ -51,6 +51,10 @@ public class FirebaseReaderSingleton {
     }
 
     public void queryFriends(ValueEventListener valueEventListener) {
+        if (mUser == null) {
+            return ;
+        }
+
         mDatabaseReference.child(KEY_FRIENDSHIPS).child(mUser.getUid())
                 .addValueEventListener(valueEventListener);
     }

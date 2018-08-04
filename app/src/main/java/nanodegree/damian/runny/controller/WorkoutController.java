@@ -135,6 +135,7 @@ public class WorkoutController extends Observable implements LocationListener{
         if (location == null) {
             return;
         }
+        mSession.setLastKnownLocation(location);
         String log = "Location changed! Lat: " + location.getLatitude() +
                 ", Lng: " + location.getLongitude() +
                 ", Accuracy " + location.getAccuracy();

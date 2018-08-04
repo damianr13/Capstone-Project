@@ -15,11 +15,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -114,8 +117,13 @@ public class MainActivity extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_GOOGLE_SIGN_IN_CODE:
-                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                GoogleSignInAccount account = task.getResult();
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                if (!result.isSuccess() || result.getSignInAccount() == null) {
+                    Toast.makeText(this, "Google sign in failed!", Toast.LENGTH_SHORT)
+                            .show();
+                    return ;
+                }
+                GoogleSignInAccount account = result.getSignInAccount();
                 Log.d(TAG, account.getEmail());
                 Picasso.get().load(account.getPhotoUrl()).into(mProfileImageView);
 
@@ -127,6 +135,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onAddFriendClicked() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Toast.makeText(this, "You have to be logged in for accessing this feature",
+                    Toast.LENGTH_SHORT).show();
+            return ;
+        }
+
         onSearchRequested();
     }
 

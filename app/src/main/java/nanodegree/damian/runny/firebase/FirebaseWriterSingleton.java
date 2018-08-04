@@ -18,7 +18,14 @@ import nanodegree.damian.runny.firebase.data.FirebaseRegisteredUser;
 import nanodegree.damian.runny.persistence.data.WorkoutSession;
 import nanodegree.damian.runny.persistence.database.converters.CalendarConverter;
 
-import static nanodegree.damian.runny.firebase.FirebaseConstants.*;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_DISTANCE;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_EMAIL;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_FRIENDSHIPS;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_NAME;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_PHOTO_URL;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_START_TIME;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_TIME;
+import static nanodegree.damian.runny.firebase.FirebaseConstants.KEY_USERS;
 
 /**
  * Created by robert_damian on 01.08.2018.
@@ -47,7 +54,11 @@ public class FirebaseWriterSingleton {
         }
     }
 
-    public void writeUserInfo(@NonNull  final GoogleSignInAccount account) {
+    public void writeUserInfo(@NonNull final GoogleSignInAccount account) {
+        if (mUser == null) {
+            return ;
+        }
+
         final String accountId = mUser.getUid();
 
         final DatabaseReference usersReference = mDatabaseReference.child(KEY_USERS).child(accountId);
@@ -74,6 +85,10 @@ public class FirebaseWriterSingleton {
     }
 
     public void writeWorkoutSession(@NonNull WorkoutSession session) {
+        if (mUser == null) {
+            return ;
+        }
+
         DatabaseReference runReference = mDatabaseReference.child(mUser.getUid()).push();
         Map<String, String> runAsKeyValue = new HashMap<>();
         runAsKeyValue.put(KEY_START_TIME, CalendarConverter.toTimestamp(session.getStartTime()).toString());
@@ -84,7 +99,11 @@ public class FirebaseWriterSingleton {
         runReference.setValue(runAsKeyValue);
     }
 
-    public void addFriend(FirebaseRegisteredUser otherUser) {
+    public void addFriend(@NonNull FirebaseRegisteredUser otherUser) {
+        if (mUser == null) {
+            return ;
+        }
+
         DatabaseReference newFriendshipReference = mDatabaseReference.child(KEY_FRIENDSHIPS)
                 .child(mUser.getUid()).push();
         newFriendshipReference.setValue(otherUser.userid);

@@ -2,6 +2,7 @@ package nanodegree.damian.runny;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,6 +41,7 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
     TextView mTimeTextView;
 
     private GoogleMap mGoogleMap;
+    private LatLng mTrackLineEnding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,24 +71,35 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
 
         if (Basics.hasAccessToLocation(this)) {
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Location center = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location centerLocation = locationManager
+                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            LatLng center = new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude());
             animateMapTo(center);
+            mTrackLineEnding = center;
         }
     }
 
     private void updateViews(WorkoutSession session) {
-        animateMapTo(session.getLastKnownLocation());
+        Location lastKnownLocation = session.getLastKnownLocation();
+        if (lastKnownLocation != null) {
+            LatLng currentPosition = new LatLng(lastKnownLocation.getLatitude(),
+                    lastKnownLocation.getLongitude());
+            animateMapTo(currentPosition);
+
+            if (mTrackLineEnding != null) {
+                mGoogleMap.addPolyline(new PolylineOptions()
+                        .add(mTrackLineEnding, currentPosition)
+                        .width(5)
+                        .color(Color.RED));
+            }
+            mTrackLineEnding = currentPosition;
+        }
 
         mTimeTextView.setText(session.getFormattedTimeValue(true));
         mDistanceTextView.setText(session.getFormattedDistanceValue());
     }
 
-    private void animateMapTo(Location location) {
-        if (location == null) {
-            return ;
-        }
-
-        LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
+    private void animateMapTo(LatLng currentPosition) {
         if (mGoogleMap != null) {
             mGoogleMap.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(currentPosition, DEFAULT_ZOOM));
