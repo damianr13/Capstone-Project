@@ -16,10 +16,6 @@
             style="@style/BottomBarImageAction"
             android:src="@drawable/ic_add_friend"/>
 
-        <ImageView
-            android:id="@+id/iv_delete"
-            style="@style/BottomBarImageAction"
-            android:src="@drawable/ic_delete"/>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
