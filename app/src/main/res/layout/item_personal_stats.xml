@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--I chose RelativeLayout so I can include this layout in the widget-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,38 +13,34 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_start_default"
         android:layout_marginRight="@dimen/margin_start_default"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_alignParentTop="true"
         tools:text="Run 1" />
 
     <TextView
         style="@style/LabelText"
         android:id="@+id/tv_label_distance"
         android:text="@string/label_distance"
-        app:layout_constraintStart_toStartOf="@id/tv_entry_title"
-        app:layout_constraintTop_toBottomOf="@id/tv_entry_title" />
+        android:layout_below="@id/tv_entry_title"/>
 
     <TextView
         style="@style/LabelText"
         android:id="@+id/tv_label_time"
         android:text="@string/label_time"
-        app:layout_constraintStart_toStartOf="@id/tv_label_distance"
-        app:layout_constraintTop_toBottomOf="@id/tv_label_distance" />
+        android:layout_below="@id/tv_label_distance"/>
 
     <TextView
         style="@style/ValueText"
         android:id="@+id/tv_value_distance"
-        app:layout_constraintStart_toEndOf="@id/tv_label_distance"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tv_label_distance"
+        android:layout_below="@id/tv_entry_title"
+        android:layout_centerHorizontal="true"
         tools:text="2.5 km" />
 
     <TextView
         style="@style/ValueText"
         android:id="@+id/tv_value_time"
-        app:layout_constraintStart_toStartOf="@id/tv_value_distance"
-        app:layout_constraintTop_toTopOf="@id/tv_label_time"
+        android:layout_below="@id/tv_label_distance"
+        android:layout_centerHorizontal="true"
         tools:text="15'23''"/>
 
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

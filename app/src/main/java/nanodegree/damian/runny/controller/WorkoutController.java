@@ -25,6 +25,8 @@ import nanodegree.damian.runny.firebase.FirebaseWriterSingleton;
 import nanodegree.damian.runny.persistence.data.WorkoutSession;
 import nanodegree.damian.runny.persistence.database.AppDatabase;
 import nanodegree.damian.runny.utils.Basics;
+import nanodegree.damian.runny.widget.WorkoutSessionWidgetProvider;
+import nanodegree.damian.runny.widget.WorkoutSessionWidgetService;
 
 /**
  * Controller of the workout session. Keeps track of distance and time, and informs the observers
@@ -113,6 +115,7 @@ public class WorkoutController extends Observable implements LocationListener{
         FirebaseWriterSingleton.getInstance().writeWorkoutSession(mSession);
 
         mLocationManager.removeUpdates(this);
+        WorkoutSessionWidgetService.startActionUpdateWidgets(mContext);
     }
 
     /**

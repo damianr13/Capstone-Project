@@ -22,6 +22,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <receiver android:name=".widget.WorkoutSessionWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/workout_session_widget_provider" />
+        </receiver>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -40,6 +51,7 @@
         <activity android:name=".WorkoutActivity" />
 
         <service android:name=".services.WorkoutService" />
+        <service android:name=".widget.WorkoutSessionWidgetService" />
 
         <activity android:name=".FriendSearchActivity"
             android:launchMode="singleTop">
