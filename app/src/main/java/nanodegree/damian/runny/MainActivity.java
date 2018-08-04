@@ -52,10 +52,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = MainActivity.class.getName();
 
-    public static final String FIREBASE_WEB_CLIENT_ID = "firebase_web_client_id_for_google";
-
     public static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
-    public static final int PERMISSIONS_REQUEST_LOGS_AND_STORAGE = 201;
 
     public static final int REQUEST_GOOGLE_SIGN_IN_CODE = 0;
 
@@ -178,14 +175,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.fab_start)
     public void onStartRunning(View v){
-        if (!Basics.hasAccessToLogs(this) || !Basics.hasAccessToStorage(this)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_LOGS,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSIONS_REQUEST_LOGS_AND_STORAGE);
-        }
-
         Intent startRunnyService = new Intent(this, WorkoutService.class);
         startRunnyService.setAction(WorkoutService.ACTION_START);
         startService(startRunnyService);

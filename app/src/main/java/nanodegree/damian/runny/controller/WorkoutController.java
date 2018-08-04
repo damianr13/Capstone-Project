@@ -49,15 +49,12 @@ public class WorkoutController extends Observable implements LocationListener{
     private WorkoutSession mSession;
 
     private Timer mInformingTimer;
-    private OutputStream mLogStream;
 
     public WorkoutController(Context context) {
         this.mContext = context;
 
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         registerLocationListener();
-
-        initLogs();
     }
 
     public WorkoutController(Context context, WorkoutSession session) {
@@ -99,14 +96,6 @@ public class WorkoutController extends Observable implements LocationListener{
     }
 
     public void stop() {
-        if (mLogStream != null) {
-            try {
-                mLogStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         mInformingTimer.cancel();
         mInformingTimer.purge();
 
@@ -136,18 +125,10 @@ public class WorkoutController extends Observable implements LocationListener{
             return;
         }
         mSession.setLastKnownLocation(location);
-        String log = "Location changed! Lat: " + location.getLatitude() +
-                ", Lng: " + location.getLongitude() +
-                ", Accuracy " + location.getAccuracy();
-        if (mLogStream != null) {
-            try {
-                mLogStream.write(log.getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
-        Log.v(TAG, log);
+        Log.v(TAG, "Location changed! Lat: " + location.getLatitude() +
+                ", Lng: " + location.getLongitude() +
+                ", Accuracy " + location.getAccuracy());
 
         if (mStarted && mLastKnownLocation != null &&
                 allLocationsAreAccurate(mLastKnownLocation, location)) {
@@ -209,25 +190,6 @@ public class WorkoutController extends Observable implements LocationListener{
             super.onPostExecute(id);
             mCallback.insertOperationCompleted(id);
         }
-    }
-
-    private void initLogs() {
-        String appLogsDirectoryName = Environment.getExternalStorageDirectory() + "/RunnyLogs";
-        File currentLogFile = new File(appLogsDirectoryName +
-                "/log" +
-                System.currentTimeMillis() +
-                ".txt");
-
-        currentLogFile.getParentFile().mkdirs();
-
-        try {
-            if(currentLogFile.createNewFile()) {
-                mLogStream = new FileOutputStream(currentLogFile);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     static class UpdateSessionAsyncTask extends AsyncTask<WorkoutSession, Void, Void> {
