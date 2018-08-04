@@ -1,12 +1,14 @@
 package nanodegree.damian.runny;
 
 import android.arch.lifecycle.LiveData;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,8 +19,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import nanodegree.damian.runny.persistence.data.WorkoutSession;
 import nanodegree.damian.runny.persistence.database.AppDatabase;
+import nanodegree.damian.runny.services.WorkoutService;
 import nanodegree.damian.runny.utils.Basics;
 
 public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCallback{
@@ -86,6 +90,13 @@ public class WorkoutActivity extends AppCompatActivity implements OnMapReadyCall
             mGoogleMap.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(currentPosition, DEFAULT_ZOOM));
         }
+    }
+
+    @OnClick(R.id.fab_stop)
+    public void onStopClick(View v) {
+        Intent stopRunningIntent = new Intent(this, WorkoutService.class);
+        stopRunningIntent.setAction(WorkoutService.ACTION_STOP);
+        startService(stopRunningIntent);
     }
 
     static class GetSessionAsyncTask extends AsyncTask<Void, Void, LiveData<WorkoutSession>> {

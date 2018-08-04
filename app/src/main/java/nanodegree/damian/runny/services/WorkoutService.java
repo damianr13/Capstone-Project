@@ -117,8 +117,8 @@ public class WorkoutService extends Service {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_runner)
-                .setContentTitle("My notification")
-                .setContentText("Hello World!")
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.workout_in_progress))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(launchActivityPendingIntent)
                 .setOngoing(true)

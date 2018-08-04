@@ -9,4 +9,5 @@
     <dimen name="widget_title_margin">8dp</dimen>
     <dimen name="widget_height">100dp</dimen>
     <dimen name="widget_width">160dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>
