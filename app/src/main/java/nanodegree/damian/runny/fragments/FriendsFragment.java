@@ -55,11 +55,10 @@ public class FriendsFragment extends Fragment {
         friendsHistoryRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendsHistoryRecyclerView.setAdapter(mAdapter);
 
-        loadFriendsWorkouts();
         return result;
     }
 
-    private void loadFriendsWorkouts() {
+    public void loadFriendsWorkouts() {
         mAdapter.emptyFriendsWorkoutList();
         FirebaseReaderSingleton.getInstance().queryFriends(new ValueEventListener() {
             @Override

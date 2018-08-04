@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mFirebaseAuth;
 
+    private FriendsFragment mFriendsFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,9 +93,11 @@ public class MainActivity extends AppCompatActivity implements
 
         setSupportActionBar(mToolbar);
 
+        mFriendsFragment = new FriendsFragment();
+
         ViewPageAdapter tabFragmentAdapter = new ViewPageAdapter(getSupportFragmentManager());
         tabFragmentAdapter.addTab(NAME_PERSONAL_STATS_TAB, new PersonalStatsFragment());
-        tabFragmentAdapter.addTab(NAME_FRIENDS_TAB, new FriendsFragment());
+        tabFragmentAdapter.addTab(NAME_FRIENDS_TAB, mFriendsFragment);
         mTabsViewPager.setAdapter(tabFragmentAdapter);
 
         mTabLayout.setupWithViewPager(mTabsViewPager);
@@ -103,11 +107,6 @@ public class MainActivity extends AppCompatActivity implements
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_FINE_LOCATION);
         }
-
-        if (Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
-
-        }
-
     }
 
     @Override
@@ -121,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements
                 Picasso.get().load(account.getPhotoUrl()).into(mProfileImageView);
 
                 firebaseAuthWithGoogle(account);
+
                 break;
         }
     }
@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(authResult -> {
             FirebaseWriterSingleton.getInstance().writeUserInfo(acct);
+            mFriendsFragment.loadFriendsWorkouts();
         });
     }
 }

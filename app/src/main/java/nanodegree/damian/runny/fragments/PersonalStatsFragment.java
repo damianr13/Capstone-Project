@@ -110,11 +110,6 @@ public class PersonalStatsFragment extends Fragment {
 
     @UiThread
     public void updatePerformanceBarChart(TreeMap<Integer, Float> monthlyPerformance) {
-        if (monthlyPerformance.size() < 3) {
-            monthlyPerformance.put((monthlyPerformance.firstKey() - 1) % MONTHS_IN_YEAR, 3000f);
-            monthlyPerformance.put((monthlyPerformance.lastKey() + 1) % MONTHS_IN_YEAR, 13000f);
-        }
-
         List<BarEntry> data = new ArrayList<>();
         float max = 0;
         String[] months = new DateFormatSymbols().getMonths();
