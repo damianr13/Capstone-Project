@@ -12,4 +12,5 @@ gradle\.properties
 \.idea/
 
 app/src/debug/res/values/api_access\.xml
+app/src/release/res/values/api_access\.xml
 app/google-services\.json
