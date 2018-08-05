@@ -15,4 +15,5 @@
     <string name="search_hint">Name of your friend</string>
     <string name="runny_highlights">Highlights</string>
     <string name="workout_in_progress">Workout in progress...</string>
+    <string name="add_friend_content_description">Add Friend</string>
 </resources>

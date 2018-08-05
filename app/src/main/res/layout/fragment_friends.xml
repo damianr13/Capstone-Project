@@ -14,7 +14,8 @@
         <ImageView
             android:id="@+id/iv_add_friend"
             style="@style/BottomBarImageAction"
-            android:src="@drawable/ic_add_friend"/>
+            android:src="@drawable/ic_add_friend"
+            android:contentDescription="@string/add_friend_content_description"/>
 
     </LinearLayout>
 
