@@ -67,6 +67,9 @@ public class WorkoutController extends Observable implements LocationListener{
         mDistance = session.getDistance();
     }
 
+    /**
+     * Starts the workout session
+     */
     public void start() {
         mStarted = true;
         Calendar mStartTime = Calendar.getInstance();
@@ -156,6 +159,11 @@ public class WorkoutController extends Observable implements LocationListener{
 
     }
 
+    /**
+     * Checks if all locations provided are accurate enough to take into account
+     * @param locations A variable number of locations
+     * @return A boolean stating if all provided locations are valid
+     */
     private boolean allLocationsAreAccurate(Location... locations) {
         for (Location location : locations) {
             if (location.getAccuracy() > MAX_ACCURACY_MARGIN) {

@@ -55,6 +55,9 @@ public class FriendsFragment extends Fragment {
         return result;
     }
 
+    /**
+     * Starts loading workout sessions published by friends
+     */
     public void loadFriendsWorkouts() {
         mAdapter.emptyFriendsWorkoutList();
         FirebaseReaderSingleton.getInstance().queryFriends(new ValueEventListener() {
@@ -72,6 +75,11 @@ public class FriendsFragment extends Fragment {
         });
     }
 
+    /**
+     * Visually adds the workouts published by a specific friends to this fragment view
+     *
+     * @param friendId - the database user id of the friend
+     */
     private void addWorkoutsForFriendWithId(String friendId) {
         FirebaseReaderSingleton.getInstance().queryUser(friendId, new ValueEventListener() {
             @Override
@@ -86,6 +94,11 @@ public class FriendsFragment extends Fragment {
         });
     }
 
+    /**
+     * Visually adds the workouts published by a specific friends to this fragment view
+     *
+     * @param friend - the database reference of the friend
+     */
     private void addWorkoutsForFriend(FirebaseRegisteredUser friend) {
         FirebaseReaderSingleton.getInstance().queryFriendsWorkouts(friend.userid,
             new ValueEventListener() {

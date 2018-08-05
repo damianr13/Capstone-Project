@@ -41,8 +41,7 @@ import nanodegree.damian.runny.viewmodel.WorkoutHistoryViewModel;
  */
 public class PersonalStatsFragment extends Fragment {
 
-    private static final int MONTHS_IN_YEAR = 12;
-    private static final float CHART_MAX_VALUE_RATIO = 5f/3f;
+    private static final int METERS_IN_KILOMETER = 1000;
 
     private WorkoutHistoryAdapter mAdapter;
 
@@ -91,6 +90,13 @@ public class PersonalStatsFragment extends Fragment {
         });
     }
 
+    /**
+     * Computes the monthly performance of the user
+     *
+     * @param sessionList The list of all the workout sessions completed by the user
+     * @return A map having the month index as key (January is 0) and the number of completed meters
+     * as value
+     */
     @WorkerThread
     public TreeMap<Integer, Float> computeMonthlyPerformance(List<WorkoutSession> sessionList) {
         TreeMap<Integer, Float> monthlyPerformance = new TreeMap<>();
@@ -108,16 +114,22 @@ public class PersonalStatsFragment extends Fragment {
         return monthlyPerformance;
     }
 
+    /**
+     * Updates the bar chart that displays the user's monthly performance (number of kilometers
+     * completed each month)
+     *
+     * @param monthlyPerformance - a map that has month index as keys (January is 0) and number of
+     *                           completed meters as value
+     */
     @UiThread
     public void updatePerformanceBarChart(TreeMap<Integer, Float> monthlyPerformance) {
         List<BarEntry> data = new ArrayList<>();
         float max = 0;
         String[] months = new DateFormatSymbols().getMonths();
-        int index = 0;
         for (Map.Entry<Integer, Float> entry : monthlyPerformance.entrySet()) {
-            data.add(new BarEntry(entry.getKey(), entry.getValue() / 1000));
-            if (entry.getValue() / 1000 > max) {
-                max = entry.getValue() / 1000;
+            data.add(new BarEntry(entry.getKey(), entry.getValue() / METERS_IN_KILOMETER));
+            if (entry.getValue() / METERS_IN_KILOMETER > max) {
+                max = entry.getValue() / METERS_IN_KILOMETER;
             }
         }
         BarDataSet dataSet = new BarDataSet(data, "Label");
@@ -133,29 +145,15 @@ public class PersonalStatsFragment extends Fragment {
         mHistoryBarChart.getDescription().setEnabled(false);
         mHistoryBarChart.getLegend().setEnabled(false);
         mHistoryBarChart.setTouchEnabled(false);
-        mHistoryBarChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                if ((int) value != value) {
-                    return "";
-                }
-
-                return months[(int) value];
+        mHistoryBarChart.getXAxis().setValueFormatter((value, axis) -> {
+            if ((int) value != value) {
+                return "";
             }
+
+            return months[(int) value];
         });
         mHistoryBarChart.invalidate();
      }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-    }
 
     @Override
     public void onDetach() {
