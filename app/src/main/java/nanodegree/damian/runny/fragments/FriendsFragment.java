@@ -40,7 +40,6 @@ public class FriendsFragment extends Fragment {
     private FriendsWorkoutHistoryAdapter mAdapter;
 
     public FriendsFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -50,8 +49,6 @@ public class FriendsFragment extends Fragment {
         // Inflate the layout for this fragment
         ButterKnife.bind(this, result);
 
-        mAdapter = new FriendsWorkoutHistoryAdapter(
-                getActivity(), null);
         friendsHistoryRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendsHistoryRecyclerView.setAdapter(mAdapter);
 
@@ -112,6 +109,8 @@ public class FriendsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        mAdapter = new FriendsWorkoutHistoryAdapter(context, null);
         if (context instanceof OnFriendsFragmentInteractionListener) {
             mListener = (OnFriendsFragmentInteractionListener) context;
         } else {

@@ -1,9 +1,7 @@
 package nanodegree.damian.runny;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -23,15 +21,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.LinkedHashMap;
@@ -80,6 +72,12 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // We do this because android handles fragment reconstruction on configuration change
+        // but we take care of this manually below (and if we keep both it results in a conflict)
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
         ButterKnife.bind(this);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -181,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements
                     PERMISSIONS_REQUEST_FINE_LOCATION);
         }
 
-        if (!Basics.hasAccessToLogs(this)) {
+        if (!Basics.hasAccessToLocation(this)) {
             Toast.makeText(this, "This feature is only available if location is enabled",
                     Toast.LENGTH_LONG).show();
             return ;
