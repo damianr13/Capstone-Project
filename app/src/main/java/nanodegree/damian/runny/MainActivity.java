@@ -42,6 +42,8 @@ import nanodegree.damian.runny.utils.Basics;
 public class MainActivity extends AppCompatActivity implements
         FriendsFragment.OnFriendsFragmentInteractionListener{
 
+		
+		// COmment pentru demonstratie
     private static final String TAG = MainActivity.class.getName();
 
     public static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
